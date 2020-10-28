@@ -17,7 +17,7 @@ const corsOptions = {
 };
 
 const indexAPIRouter = require('./api/routes/index');
-// const usersRouter = require('.api/routes/users');
+const usersRouter = require('./api/routes/users');
 
 const app = express();
 
@@ -55,7 +55,7 @@ app.use((req, res, next)=>{
 
 
 app.use('/api', indexAPIRouter);
-// app.use('/api/users', usersRouter);
+app.use('/api/users', usersRouter);
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

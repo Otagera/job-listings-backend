@@ -58,4 +58,4 @@ process.on('SIGTERM', () => {
 
 require('./companies');
 require('./listings');
-//require('./teams');
+require('./users');

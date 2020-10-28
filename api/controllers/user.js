@@ -1,91 +1,78 @@
 const mongoose = require('mongoose');
-const Team = mongoose.model('Team');
-const Player = mongoose.model('Player');
-const teamData = require('../../team-data');
+const User = mongoose.model('User');
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 
-const getTeams = (req, res) =>{
-	Team.find((err, teams)=>{
-		if(err) { res.send({ error: err }); }
-		res.statusJson( 200, { teams: teams });
+const userSignUp = (req, res)=>{
+	User.find({ email: req.body.email }).exec().then(user=>{
+		if(user.length >= 1) {
+			return res.statusJson(409, { message: 'Sorry this email exists' })
+		}else {
+			bcrypt.hash(req.body.password, 10, (err, hash)=>{
+				if(err){ return res.statusJson(500, { error: err }); }
+				else {
+					const user = new User({
+						email: req.body.email,
+						password: hash
+					});	
+					user.save().then(result=>{
+						return res.statusJson(201, {message: 'User Created', user: user });
+					}).catch(err=>{
+						console.log(err);
+						return res.statusJson(500, { error: err });
+					});		
+				}
+			});
+		}
 	});
 }
 
-const createTeam = ({ body }, res)=>{
-    if(!body.name) { return res.statusJson(400, { message: "Missing name for the team" });}
-	let team = {
-		name: body.name,
-		fakeid: body.fakeid
-	}
-	Team.create(team, (err, newTeam)=>{
-		if(err) { res.send({ error: err }); }
-		res.statusJson( 200, { newTeam: newTeam });
-	});
-}
-
-const getTeam = ({ params }, res) =>{
-	Team.findOne( { fakeid: params.playerid }, (err, team)=>{
-		if(err) { res.send({ error: err }); }
-		res.statusJson( 200, { team: team });
-	});
-}
-
-const updateTeam = ({ body, params }, res)=>{
-    if(!body.name) { return res.statusJson(400, { message: "Missing name for the team" }); }
-
-	Team.findOne({ fakeid: params.playerid }, (err, team)=>{
-		if(err) { res.send({ error: err }); }
-		if(!team) { return res.statusJson(404, { message: "Team could not be found" }); }
-
-		Team.name = body.name;
-		Team.save((err, updatedTeam)=>{
-			if(err) { res.send({ error: err }); }
-
-			res.statusJson( 200, { team: updatedTeam });
+const userLogin = (req, res)=>{
+	User.find({ email: req.body.email })
+		.exec()
+		.then(user=>{
+			if(user.length < 1){
+				return res.statusJson(401, { message: 'Auth failed' });
+			}
+			bcrypt.compare(req.body.password, user[0].password, (err, result)=>{
+				if(err) { return res.statusJson(401, { message: 'Auth failed' }); }
+				if(result){
+					//remember to set up env{nodemon.json)} file and replace process.env.JWT_KEY
+					let JWT_KEY = 'secret';
+					const token = jwt.sign(
+						{
+							email: user[0].email,
+							userId: user[0]._id
+						},
+						JWT_KEY,
+						{
+							expiresIn: '1h'
+						});
+					return res.statusJson(200, { message: 'Auth successful', token: token })
+				}
+				return res.statusJson(401, { message: 'Auth failed' });
+			})
+		})
+		.catch(err=>{
+			console.log(err);
+			return res.statusJson(500, { error: err });
 		});
-	});
 }
 
-const deleteTeam = ({ params }, res)=>{
-	Team.findByIdAndRemove(params.playerid, (err, teamDeleted)=>{
-		if(err) { res.send({ error: err }); }
-		res.statusJson( 200, { teamDeleted: teamDeleted });
-	});
-}
-
-const resetTeams = (req, res)=>{
-	let playerz;
-	let p1 = new Promise((resolve, reject)=>{
-		Player.find((err, players)=>{
-			if(err) { reject('Error'); res.send({ error: err }); }
-			playerz = players;
-			resolve('Success');
+const userDelete = (req, res)=>{
+	User.remove({ _id: req.params.userid })
+		.exec()
+		.then(result=>{
+			return res.statusJson(200, { message: 'User deleted' });
+		})
+		.catch(err=>{
+			console.log(err);
+			return res.statusJson(500, { error: err });
 		});
-	});
-	p1.then(()=>{
-		Team.deleteMany((err, info)=>{
-	        if(err) { return res.json({ error: err }); }
-	        teamData.forEach((team)=>{
-	        	let tempPlayers = [];
-	        	playerz.forEach((player)=>{
-	        		if(player.team === team.name){
-	        			tempPlayers.push(player);
-	        		}
-	        	});
-	        	team.players = tempPlayers;
-	        });
-	        Team.insertMany(teamData, (err, teams)=>{
-	        	if(err) { return res.json({ error: err }); }
-				res.statusJson( 200, { teams: teams });
-	    	});
-	    });
-	});
 }
 
 module.exports= {
-	getTeams,
-	createTeam,
-	getTeam,
-	updateTeam,
-	deleteTeam,
-	resetTeams
+	userSignUp,
+	userLogin,
+	userDelete
 }

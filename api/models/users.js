@@ -1,22 +1,16 @@
 const mongoose = require('mongoose');
 const Schema = mongoose.Schema;
-const Player = mongoose.model('Player');
 
 mongoose.set('useCreateIndex', true);
 
-const teamSchema = new Schema({
-	name: 	 { 
-		type: String,
-		required: true
-	},
-	players: [{
-		player: { type: Schema.Types.ObjectId, ref: 'Player' }
-	}],
-	fakeid: {
-		type: Number,
-		required: true,
-		unique: true
-	}
+const userSchema = new Schema({
+	email: 		{
+					type: String,
+					required: true,
+					unique: true,
+					match: /^([a-zA-Z0-9_\-\.]+)@([a-zA-Z0-9_\-\.]+)\.([a-zA-Z]{2,5})$/
+				},
+	password: 	{ type: String, required: true }
 });
 
-mongoose.model('Team', teamSchema);
+mongoose.model('User', userSchema);

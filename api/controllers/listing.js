@@ -11,10 +11,8 @@ const setHowOld = (listing)=>{
 	if(ttt === 0){
 		tttt = 'New!';
 		listing.isThereNew = true;
-		console.log('1');
 	} else if(ttt < 7){
 		listing.isThereNew = true;
-		console.log('2');
 		tttt = ttt + 'd';
 	} else if(ttt >= 7 && ttt < 28){
 		tttt = Math.floor(ttt / 7) + 'w';
