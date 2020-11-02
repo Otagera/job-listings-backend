@@ -108,7 +108,7 @@ const deleteCompanies = (req, res)=>{
 const resetCompanies = (req, res)=>{
 	Company.deleteMany((err, info)=>{
         if(err) { return res.json({ error: err }); }
-
+        console.log(info)
         companyData.forEach((company)=>{
         	let fsdata = req.files[company.img][0];
         	company.img = fsdata.path;
