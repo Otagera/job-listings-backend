@@ -9,10 +9,11 @@ const path = require('path');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
 
+
 require('./api/models/db');
 
 const corsOptions = {
-	orogin: true,
+	origin: true,
 	credentials: true
 };
 

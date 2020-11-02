@@ -63,12 +63,6 @@ const createListing = ({ body, file }, res)=>{
 			return res.statusJson(404)
 		}
 
-		for(let i = 0; i < listings.length; i++){
-	        if(listings[i].fakeId != i + 1){
-	            var newID = i + 1;
-	            break;
-	        }
-	    }
 		let listing = {
 	    	//companyName: body.companyName,
 	    	isThereNew: true,
@@ -84,7 +78,7 @@ const createListing = ({ body, file }, res)=>{
 	    	tools: (body.tools)? body.tools : [],
 	    	//img: (file)? file.path: '',
 	    	salary: Number.parseInt(body.salary, 10),
-            fakeId: newID || listings.length + 1
+            fakeId: listings.length + 1
 		};
 		setHowOld(listing);
 
@@ -122,9 +116,9 @@ const getListing = ({ params }, res) =>{
 }
 const updateListing = (req, res)=>{
 	//console.log(req.body);
-    if(!req.body.companyName || !req.body.jobTitle || !req.body.typeOfEmployment || !req.body.location || !req.body.role || !req.body.level) {
+    if(!req.body.jobTitle || !req.body.typeOfEmployment || !req.body.location || !req.body.role || !req.body.level) {
     	return res.statusJson(400, { 
-    		message: "Missing either the company name, job tile, how old, type of employment, location, role, or location" 
+    		message: "Missing either the job tile, how old, type of employment, location, role, or location" 
     	});
     }
 

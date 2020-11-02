@@ -19,7 +19,7 @@ const listingSchema = new Schema({
 	tools: 			  [{ type: String }],
 	salary:			  { type: Number },
 	company: 		  { type: Schema.Types.ObjectId, ref: 'Company' },
-	fakeId: 		  { type: Number }
+	fakeId: 		  { type: Number, unique: true }
 });
 
 mongoose.model('Listing', listingSchema);
