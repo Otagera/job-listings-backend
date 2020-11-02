@@ -1,3 +1,4 @@
+const fs = require('fs');
 module.exports = (req, res, next)=>{
 					fs.readdir(directory, (err, files)=>{
 					   	if(err) throw err;
