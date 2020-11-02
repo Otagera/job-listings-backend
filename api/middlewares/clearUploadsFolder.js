@@ -1,4 +1,6 @@
 const fs = require('fs');
+
+const directory = path.join(__dirname, '../../uploads');
 module.exports = (req, res, next)=>{
 					fs.readdir(directory, (err, files)=>{
 					   	if(err) throw err;
