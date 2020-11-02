@@ -40,7 +40,7 @@ router.route('/company/:companyid')
 	  .put(apiGuard, checkAuth, companyCtrl.updateCompany)
 	  .delete(apiGuard, checkAuth, companyCtrl.deleteCompany);
 router.route('/reset-companies').get(clearUploadsFolder, upload.fields([
-											{name: 'photosnapImg', maxCount: 1},
+											{name: 'photosnapImg', maxCount: 1}/*,
 											{name: 'manageImg', maxCount: 1},
 											{name: 'accountImg', maxCount: 1},
 											{name: 'myHomeImg', maxCount: 1},
@@ -49,7 +49,7 @@ router.route('/reset-companies').get(clearUploadsFolder, upload.fields([
 											{name: 'shortlyImg', maxCount: 1},
 											{name: 'insureImg', maxCount: 1},
 											{name: 'eyecamImg', maxCount: 1},
-											{name: 'airFilterImg', maxCount: 1}
+											{name: 'airFilterImg', maxCount: 1}*/
 										]), companyCtrl.resetCompanies);
 //put, post, delete
 module.exports = router;
