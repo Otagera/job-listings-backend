@@ -104,7 +104,7 @@ const createListing = ({ body, file }, res)=>{
     });
 }
 const getListing = ({ params }, res) =>{
-	Listing.findOne().populate('company').exec( { fakeId: params.listingid } , (err, listing)=>{
+	Listing.findOne({ fakeId: params.listingid }).populate('company').exec((err, listing)=>{
 		if(err){
 			return res.statusJson(500, { error: err });
 		}else if(!listing){
