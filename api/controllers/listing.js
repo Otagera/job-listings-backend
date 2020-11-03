@@ -23,6 +23,7 @@ const setHowOld = (listing)=>{
 }
 
 const getListings = (req, res) =>{
+	console.log(req.headers.host);
 	Listing.find().sort({ dateCreated: 'desc' }).populate('company').exec((err, listings)=>{
 		if(err) { res.send({ error: err }); }
 
