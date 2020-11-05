@@ -46,7 +46,7 @@ const userLogin = (req, res)=>{
 						},
 						JWT_KEY,
 						{
-							expiresIn: '1h'
+							expiresIn: '48h'
 						});
 					return res.statusJson(200, { message: 'Auth successful', token: token })
 				}
