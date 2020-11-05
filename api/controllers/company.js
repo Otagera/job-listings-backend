@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Company = mongoose.model('Company');
+const Listing = mongoose.model('Listing');
 const companyData = require('../models/company-data');
 
 const getCompanies = (req, res) =>{
@@ -94,10 +95,38 @@ const updateCompany = (req, res)=>{
 	});
 }
 const deleteCompany = ({ params }, res)=>{
-	Company.findOneAndDelete({ fakeId: params.companyid } ,(err, companyDeleted)=>{
-		if(err) { res.send({ error: err }); }
-		res.statusJson( 200, { companyDeleted: companyDeleted });
-	});
+	Listing.find({})
+			.populate({
+				path: 'company',
+				match: { fakeId: params.companyid }
+			})
+			.exec((err, listings)=>{
+				if(err) { return res.send({ error: err }); }
+				listings = listings.filter(listing=>{
+					return listing.company;
+				});
+				let promises = [];
+				let listingsDeleted = [];
+				listings.forEach(listing => {
+					promises.push(new Promise((resolve, reject) => {
+						Listing.deleteOne({ fakeId: listing.fakeId }, (err, listingDeleted)=>{
+							if(err) { reject('Failled');return res.send({ error: err }); }
+							listingsDeleted.push(listingDeleted);
+							resolve('Success');
+						});
+					}));
+				});
+				Promise.all(promises).then(()=>{
+					Company.findOneAndDelete({ fakeId: params.companyid } ,(err, companyDeleted)=>{
+						if(err) { return res.send({ error: err }); }
+
+						return res.statusJson( 200, {
+							companyDeleted: companyDeleted,
+							listingsDeleted: listingsDeleted
+						});						
+					});
+				});
+			});
 }
 const deleteCompanies = (req, res)=>{
 	Company.deleteMany((err, info)=>{

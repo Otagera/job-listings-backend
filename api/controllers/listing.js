@@ -13,17 +13,16 @@ const setHowOld = (listing)=>{
 		listing.isThereNew = true;
 	} else if(ttt < 7){
 		listing.isThereNew = true;
-		tttt = ttt + 'd';
+		tttt = ttt + 'd ago';
 	} else if(ttt >= 7 && ttt < 28){
-		tttt = Math.floor(ttt / 7) + 'w';
+		tttt = Math.floor(ttt / 7) + 'w ago';
 	} else if(ttt >= 28 && ttt < 365){
-		tttt = Math.floor(ttt / 30) + 'mon';
+		tttt = Math.floor(ttt / 30) + 'mon ago';
 	}
 	listing.howOld = tttt;
 }
 
 const getListings = (req, res) =>{
-	console.log(req.headers.host);
 	Listing.find().sort({ dateCreated: 'desc' }).populate('company').exec((err, listings)=>{
 		if(err) { res.send({ error: err }); }
 
@@ -45,6 +44,9 @@ const getListingsByCompany = (req, res) =>{
 
 				listings.forEach((listing)=>{
 					setHowOld(listing);
+				});
+				listings = listings.filter(listing=>{
+					return listing.company;
 				});
 
 				res.statusJson( 200, { listings: listings });

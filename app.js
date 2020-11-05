@@ -42,7 +42,7 @@ app.use((req, res, next)=>{
 			statusCode: statusCode
 		}
 		res.status(statusCode).json(obj);
-		return ;
+		return;
 	}
 	next();
 });
