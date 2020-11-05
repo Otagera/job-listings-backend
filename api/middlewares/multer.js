@@ -9,16 +9,7 @@ cloudinary.config({
 	api_secret: 'JSDqr-nva3H92LFl-AktW0y5MZ4'
 });
 
-let storage = multer.diskStorage({
-	destination: function(req, file, cb) {
-		fs.mkdir('./uploads/', (err)=>{
-			cb(null, './uploads/');
-		});
-	},
-	filename: function(req, file, cb) {
-		cb(null, new Date().toISOString().replace(/:/g, '-') + file.originalname);
-	}
-});
+let storage = null;
 
 if (process.env.NODE_ENV === 'production') {
     storage = new CloudinaryStorage({
@@ -29,6 +20,17 @@ if (process.env.NODE_ENV === 'production') {
 				allowedFormat:   ['svg', 'jpg', 'png'],
 				public_id: new Date().toISOString().replace(/:/g, '-') + file.originalname
 			};
+		}
+	});
+}else {
+	storage = multer.diskStorage({
+		destination: function(req, file, cb) {
+			fs.mkdir('./uploads/', (err)=>{
+				cb(null, './uploads/');
+			});
+		},
+		filename: function(req, file, cb) {
+			cb(null, new Date().toISOString().replace(/:/g, '-') + file.originalname);
 		}
 	});
 }
